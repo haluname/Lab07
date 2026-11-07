@@ -1,4 +1,6 @@
 import flet as ft
+from flet.controls import border
+
 from UI.alert import AlertManager
 
 '''
@@ -20,6 +22,8 @@ class View:
 
         # Controller
         self.controller = None
+        self.biblioteche = []
+        self.generi = []
 
     def show_alert(self, messaggio):
         self.alert.show_alert(messaggio)
@@ -44,6 +48,25 @@ class View:
         # --- Toggle Tema ---
         self.toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=self.cambia_tema)
 
+        self.ddBiblioteche = ft.Dropdown(hint_text="Biblioteca", label="Biblioteche di Torino", width=300)
+        self.ddGeneri = ft.Dropdown(hint_text="Genere", label="Genere Libro", width=200)
+        self.btnLibri = ft.Button("Mostra Libri", on_click=self.controller.filtra_libri)
+        self.listaLibri = ft.ListView(expand=True, spacing=10)
+
+
+        self.biblioteche = self.controller.get_biblioteche()
+        self.generi = self.controller.get_generi()
+
+        self.ddBiblioteche.options.append(ft.DropdownOption("Nessun Filtro"))
+        self.ddGeneri.options.append(ft.DropdownOption("Nessun Filtro"))
+
+
+        for elem in self.biblioteche:
+            self.ddBiblioteche.options.append(ft.DropdownOption(key=elem.id, text=elem.nome))
+
+        for elem in self.generi:
+            self.ddGeneri.options.append(ft.DropdownOption(elem))
+
         # --- Layout della pagina ---
         self.page.add(
             self.toggle_cambia_tema,
@@ -53,10 +76,14 @@ class View:
             ft.Divider(),
 
             # Sezione 2: Filtraggio
-            # TODO
+            ft.Row(controls=[self.ddBiblioteche, self.ddGeneri], spacing=170, alignment=ft.MainAxisAlignment.CENTER),
+            ft.Divider(),
 
             # Sezione 3: Libri
-            # TODO
+            self.btnLibri,
+            ft.Divider(),
+            self.listaLibri,
+
         )
 
         self.page.scroll = "adaptive"
@@ -67,3 +94,15 @@ class View:
         self.page.theme_mode = ft.ThemeMode.DARK if self.toggle_cambia_tema.value else ft.ThemeMode.LIGHT
         self.toggle_cambia_tema.label = "Tema scuro" if self.toggle_cambia_tema.value else "Tema chiaro"
         self.page.update()
+
+    def aggiorna_libri(self, libri):
+        self.listaLibri.controls.clear()
+
+        if not libri:
+            self.show_alert("LIBRI NON TROVATI")
+        else:
+            for libro in libri:
+                txt_libro = str(libro)
+                self.listaLibri.controls.append(ft.Text(value=txt_libro))
+
+        self.listaLibri.update()

@@ -18,10 +18,18 @@ class Controller:
         self.genere_selezionato = None
 
     # POPOLA DROPDOWN
-    # TODO
+    def get_biblioteche(self):
+        biblioteche = self._model.get_biblioteche()
+        return biblioteche
 
-    # CALLBACKS DROPDOWN
-    # TODO
+    def get_generi(self):
+        generi = self._model.get_generi()
+        return generi
+
 
     # AZIONE: MOSTRA LIBRI
-    # TODO
+    def filtra_libri(self):
+        self.biblioteca_selezionata = self._view.ddBiblioteche.value
+        self.genere_selezionato = self._view.ddGeneri.value
+        libri = self._model.get_libri_filtrati(self.biblioteca_selezionata, self.genere_selezionato)
+        self._view.aggiorna_libri(libri)
